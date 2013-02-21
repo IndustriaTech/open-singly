@@ -1,3 +1,4 @@
-from .api import Singly, get_authentication_url
+import api
+from api import Singly
 
-__all__ = ['Singly', 'get_authentication_url']
+__all__ = ['api', 'Singly']
