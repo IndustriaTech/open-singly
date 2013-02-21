@@ -34,18 +34,19 @@ def get_singly_authentication_url(service, client_id, redirect_uri, access_token
     return '%soauth/authenticate?%s' % (API_BASE_URL, urlencode(params))
 
 
-def singly_authenticate(client_id, client_secret, code):
+def singly_authenticate(client_id, client_secret, code, **params):
     """
     Try to authenticate with returned code
     This code must be obtained from a callback url to wich
     a user will be redirected after successfull authentication
 
     """
-    params = {
+    params.update({
         'client_id': client_id,
         'client_secret': client_secret,
         'code': code
-    }
+    })
+
     api = SinglyAPI()
     logger.debug("Trying to get access token with this params %s" % (params,))
     response = api.oauth.access_token.post(params)
@@ -61,8 +62,7 @@ def singly_authenticate(client_id, client_secret, code):
     if not access_token:
         return
 
-    account = response.get('account')
-    return SinglyAPI(access_token, account)
+    return SinglyAPI(**response)
 
 
 class ResourceAttributesMixin(slumber.ResourceAttributesMixin):
@@ -94,8 +94,8 @@ class Resource(ResourceAttributesMixin, slumber.Resource):
 
         """
 
-        if self._store.get('singly_access_token'):
-            kwargs['access_token'] = self._store['singly_access_token']
+        if self._store.get('access_token'):
+            kwargs['access_token'] = self._store['access_token']
         return kwargs
 
     def get(self, **kwargs):
@@ -112,18 +112,18 @@ class SinglyAPI(ResourceAttributesMixin, slumber.API):
 
     """
 
-    def __init__(self, access_token=None, account=None):
+    def __init__(self, **kwargs):
         super(SinglyAPI, self).__init__(API_BASE_URL, append_slash=False)
-        self._store.update({
-            'singly_access_token': access_token,
-            'singly_account': account,
-        })
+        self._store.update(kwargs)
 
     def get_access_token(self):
-        return self._store['singly_access_token']
+        return self._store.get('access_token')
 
     def get_account(self):
-        return self._store['singly_account']
+        return self._store.get('account')
+
+    def get_profile(self):
+        return self._store.get('profile') or {}
 
 
 class Singly(object):
@@ -151,9 +151,9 @@ class Singly(object):
         """
         return get_singly_authentication_url(service, self.app_key, self.redirect_uri, access_token)
 
-    def authenticate(self, code):
+    def authenticate(self, code, **kwargs):
         """
         wrapper over singly_authenticate function
 
         """
-        return singly_authenticate(self.app_key, self.app_secret, code)
+        return singly_authenticate(self.app_key, self.app_secret, code, **kwargs)
