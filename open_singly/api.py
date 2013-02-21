@@ -34,7 +34,7 @@ def get_singly_authentication_url(service, client_id, redirect_uri, access_token
     return '%soauth/authenticate?%s' % (API_BASE_URL, urlencode(params))
 
 
-def singly_authenticate(self, client_id, client_secret, code):
+def singly_authenticate(client_id, client_secret, code):
     """
     Try to authenticate with returned code
     This code must be obtained from a callback url to wich
@@ -48,7 +48,7 @@ def singly_authenticate(self, client_id, client_secret, code):
     }
     api = SinglyAPI()
     logger.debug("Trying to get access token with this params %s" % (params,))
-    response = api.oauth.access_token.get(**params)
+    response = api.oauth.access_token.post(params)
     logger.debug("Access token response data is %s" % (response, ))
 
     # Expect
@@ -101,8 +101,8 @@ class Resource(ResourceAttributesMixin, slumber.Resource):
     def get(self, **kwargs):
         return super(Resource, self).get(**self._get_kwargs(kwargs))
 
-    def post(self, **kwargs):
-        return super(Resource, self).post(**self._get_kwargs(kwargs))
+    def post(self, data, **kwargs):
+        return super(Resource, self).post(data, **self._get_kwargs(kwargs))
 
 
 class SinglyAPI(ResourceAttributesMixin, slumber.API):
@@ -140,7 +140,7 @@ class Singly(object):
     """
 
     def __init__(self, app_key, app_secret, redirect_uri):
-        self.app_key = app_secret
+        self.app_key = app_key
         self.app_secret = app_secret
         self.redirect_uri = redirect_uri
 
