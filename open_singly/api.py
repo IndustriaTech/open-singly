@@ -142,7 +142,7 @@ class Singly(object):
     def __init__(self, app_key, app_secret, redirect_uri):
         self.app_key = app_secret
         self.app_secret = app_secret
-        self.redirect_uri
+        self.redirect_uri = redirect_uri
 
     def get_authentication_url(self, service, access_token=None):
         """
