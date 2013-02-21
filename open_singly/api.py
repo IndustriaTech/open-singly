@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 API_BASE_URL = 'https://api.singly.com/v0/'
 
 
-def get_singly_authentication_url(service, client_id, redirect_uri):
+def get_singly_authentication_url(service, client_id, redirect_uri, access_token=None):
     """
     Get url that user must open to authenticate with given service trough singly
 
@@ -29,6 +29,8 @@ def get_singly_authentication_url(service, client_id, redirect_uri):
         'client_id': client_id,
         'redirect_uri': redirect_uri,
     }
+    if access_token:
+        params['access_token'] = access_token
     return '%soauth/authenticate?%s' % (API_BASE_URL, urlencode(params))
 
 
@@ -55,7 +57,12 @@ def singly_authenticate(self, client_id, client_secret, code):
     # }
     access_token = response.get('access_token')
     logger.debug("Access token is %s" % (access_token, ))
-    return SinglyAPI(access_token)
+
+    if not access_token:
+        return
+
+    account = response.get('account')
+    return SinglyAPI(access_token, account)
 
 
 class ResourceAttributesMixin(slumber.ResourceAttributesMixin):
@@ -105,14 +112,18 @@ class SinglyAPI(ResourceAttributesMixin, slumber.API):
 
     """
 
-    def __init__(self, access_token=None):
+    def __init__(self, access_token=None, account=None):
         super(SinglyAPI, self).__init__(API_BASE_URL, append_slash=False)
         self._store.update({
             'singly_access_token': access_token,
+            'singly_account': account,
         })
 
     def get_access_token(self):
         return self._store['singly_access_token']
+
+    def get_account(self):
+        return self._store['singly_account']
 
 
 class Singly(object):
@@ -133,12 +144,12 @@ class Singly(object):
         self.app_secret = app_secret
         self.redirect_uri
 
-    def get_authentication_url(self, service):
+    def get_authentication_url(self, service, access_token=None):
         """
         Wrapper over get_singly_authentication_url
 
         """
-        return get_singly_authentication_url(service, self.app_key, self.redirect_uri)
+        return get_singly_authentication_url(service, self.app_key, self.redirect_uri, access_token)
 
     def authenticate(self, code):
         """

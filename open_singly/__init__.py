@@ -1,4 +1,3 @@
-import api
-from api import Singly
+from api import Singly, SinglyAPI
 
-__all__ = ['api', 'Singly']
+__all__ = ['Singly', 'SinglyAPI']
