@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 API_BASE_URL = 'https://api.singly.com/v0/'
 
 
-def get_singly_authentication_url(service, client_id, redirect_uri, access_token=None):
+def get_singly_authentication_url(service, client_id, redirect_uri, access_token=None, scope=None):
     """
     Get url that user must open to authenticate with given service trough singly
 
@@ -31,6 +31,8 @@ def get_singly_authentication_url(service, client_id, redirect_uri, access_token
     }
     if access_token:
         params['access_token'] = access_token
+    if scope:
+        params['scope'] = ','.join(scope)
     return '%soauth/authenticate?%s' % (API_BASE_URL, urlencode(params))
 
 
@@ -139,17 +141,19 @@ class Singly(object):
                 Singly.
     """
 
-    def __init__(self, app_key, app_secret, redirect_uri):
+    def __init__(self, app_key, app_secret, redirect_uri, default_scopes=None):
         self.app_key = app_key
         self.app_secret = app_secret
         self.redirect_uri = redirect_uri
+        self.default_scopes = default_scopes or {}
 
-    def get_authentication_url(self, service, access_token=None):
+    def get_authentication_url(self, service, access_token=None, scope=None):
         """
         Wrapper over get_singly_authentication_url
 
         """
-        return get_singly_authentication_url(service, self.app_key, self.redirect_uri, access_token)
+        scope = scope or self.default_scopes.get(service, [])
+        return get_singly_authentication_url(service, self.app_key, self.redirect_uri, access_token, scope)
 
     def authenticate(self, code, **kwargs):
         """
