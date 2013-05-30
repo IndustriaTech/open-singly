@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='open-singly',
-    version='0.1',
+    version='0.2',
     description='Implementation of singly API for Python',
     author='Venelin Stoykov',
     author_email='venelin@magicsolutions.bg',
