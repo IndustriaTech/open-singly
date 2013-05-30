@@ -147,13 +147,16 @@ class Singly(object):
         self.redirect_uri = redirect_uri
         self.default_scopes = default_scopes or {}
 
-    def get_authentication_url(self, service, access_token=None, scope=None):
+    def get_authentication_url(self, service, access_token=None, scope=None, next_url=None):
         """
         Wrapper over get_singly_authentication_url
 
         """
         scope = scope or self.default_scopes.get(service, [])
-        return get_singly_authentication_url(service, self.app_key, self.redirect_uri, access_token, scope)
+        redirect_uri = self.redirect_uri
+        if next_url:
+            redirect_uri = '%s?%s' % (redirect_uri, urlencode({'next': next_url}))
+        return get_singly_authentication_url(service, self.app_key, redirect_uri, access_token, scope)
 
     def authenticate(self, code, **kwargs):
         """
