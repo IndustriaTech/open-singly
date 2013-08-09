@@ -8,7 +8,12 @@ Installation
 -------------
 
 
-	pip install git+git://github.com/MagicSolutions/open-singly.git
+	pip install open-singly
+
+
+or
+
+	pip install git+https://github.com/MagicSolutions/open-singly.git
 
 
 
