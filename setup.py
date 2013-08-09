@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 def get_long_description():
-    with open('./README.md', 'r') as readme:
+    with open('./README.rst', 'r') as readme:
         return readme.read()
 
 setup(

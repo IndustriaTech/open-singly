@@ -7,11 +7,14 @@ Implementation of singly API for Python
 Installation
 -------------
 
+::
 
 	pip install open-singly
 
 
 or
+
+::
 
 	pip install git+https://github.com/MagicSolutions/open-singly.git
 
@@ -20,6 +23,7 @@ or
 How to use
 ----------
 
+::
 
 	from open_singly import Singly
 
