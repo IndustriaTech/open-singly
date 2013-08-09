@@ -8,7 +8,7 @@ setup(
     author_email='venelin@magicsolutions.bg',
     url='https://github.com/MagicSolutions/open-singly',
     packages=find_packages(),
-    zip_safe=False,
+    zip_safe=True,
     install_requires=['slumber>=0.5.3'],
     classifiers=[
       'Development Status :: 4 - Beta',
